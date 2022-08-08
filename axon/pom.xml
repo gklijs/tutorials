@@ -83,7 +83,7 @@
     </dependencies>
 
     <properties>
-        <axon-bom.version>4.5.16</axon-bom.version>
+        <axon-bom.version>4.5.17</axon-bom.version>
         <de.flapdoodle.embed.mongo.version>3.4.8</de.flapdoodle.embed.mongo.version>
     </properties>
 
