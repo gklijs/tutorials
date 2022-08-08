@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @RestController
 public class OrderRestEndpoint {
@@ -94,8 +95,9 @@ public class OrderRestEndpoint {
     }
 
     @GetMapping("/all-orders")
-    public CompletableFuture<List<Order>> findAllOrders() {
-        return queryGateway.query(new FindAllOrderedProductsQuery(), ResponseTypes.multipleInstancesOf(Order.class));
+    public CompletableFuture<List<OrderResponse>> findAllOrders() {
+        return queryGateway.query(new FindAllOrderedProductsQuery(), ResponseTypes.multipleInstancesOf(Order.class))
+                .thenApply(r -> r.stream().map(OrderResponse::new).collect(Collectors.toList()));
     }
 
     @GetMapping("/total-shipped/{product-id}")
@@ -105,8 +107,9 @@ public class OrderRestEndpoint {
     }
 
     @GetMapping(path = "/order-updates/{order-id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Order> orderUpdates(@PathVariable("order-id") String orderId) {
-        return subscriptionQuery(new OrderUpdatesQuery(orderId), ResponseTypes.instanceOf(Order.class));
+    public Flux<OrderResponse> orderUpdates(@PathVariable("order-id") String orderId) {
+        return subscriptionQuery(new OrderUpdatesQuery(orderId), ResponseTypes.instanceOf(Order.class))
+                .map(OrderResponse::new);
     }
 
     private  <Q, R> Flux<R> subscriptionQuery(Q query, ResponseType<R> resultType) {
