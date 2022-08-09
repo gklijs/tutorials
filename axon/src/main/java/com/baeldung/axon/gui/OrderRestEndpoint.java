@@ -14,6 +14,7 @@ import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseType;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
+import org.axonframework.queryhandling.SubscriptionQueryResult;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -113,7 +114,7 @@ public class OrderRestEndpoint {
     }
 
     private  <Q, R> Flux<R> subscriptionQuery(Q query, ResponseType<R> resultType) {
-        var result = queryGateway.subscriptionQuery(query, resultType, resultType);
+        SubscriptionQueryResult<R,R> result = queryGateway.subscriptionQuery(query, resultType, resultType);
         return result.initialResult().concatWith(result.updates()).doFinally(signal -> result.close());
     }
 }

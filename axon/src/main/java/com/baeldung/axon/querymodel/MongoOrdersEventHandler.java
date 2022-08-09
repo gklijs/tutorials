@@ -120,7 +120,7 @@ public class MongoOrdersEventHandler implements OrdersEventHandler {
 
     @QueryHandler
     public Order handle(OrderUpdatesQuery query) {
-        return getOrder(query.getOrderId()).orElseThrow();
+        return getOrder(query.getOrderId()).orElse(null);
     }
 
     private Optional<Order> getOrder(String orderId) {
@@ -152,7 +152,7 @@ public class MongoOrdersEventHandler implements OrdersEventHandler {
                 .map(o -> updateOrder(o, updateFunction))
                 .map(this::emitUpdate)
                 .map(this::persistUpdate)
-                .orElseThrow();
+                .orElse(null);
         logger.info("Result of updating order with orderId '{}': {}", orderId, result);
     }
 

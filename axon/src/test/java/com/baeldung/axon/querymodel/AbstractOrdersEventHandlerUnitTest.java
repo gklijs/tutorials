@@ -46,12 +46,14 @@ public abstract class AbstractOrdersEventHandlerUnitTest {
         assertNotNull(result);
         assertEquals(2, result.size());
 
-        Order order_1 = result.stream().filter(o -> o.getOrderId().equals(ORDER_ID_1)).findFirst().orElseThrow();
+        Order order_1 = result.stream().filter(o -> o.getOrderId().equals(ORDER_ID_1)).findFirst().orElse(null);
+        assertNotNull(order_1);
         assertEquals(1, order_1.getProducts().size());
         assertEquals(3, order_1.getProducts().get(PRODUCT_ID_1));
         assertEquals(OrderStatus.SHIPPED, order_1.getOrderStatus());
 
-        Order order_2 = result.stream().filter(o -> o.getOrderId().equals(ORDER_ID_2)).findFirst().orElseThrow();
+        Order order_2 = result.stream().filter(o -> o.getOrderId().equals(ORDER_ID_2)).findFirst().orElse(null);
+        assertNotNull(order_2);
         assertEquals(2, order_2.getProducts().size());
         assertEquals(1, order_2.getProducts().get(PRODUCT_ID_1));
         assertEquals(1, order_2.getProducts().get(PRODUCT_ID_2));
