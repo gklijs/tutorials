@@ -6,15 +6,22 @@ import java.util.Map;
 
 import static com.baeldung.axon.gui.OrderStatusResponse.toResponse;
 
-public class OrderResponse{
-    private final String orderId;
-    private final Map<String, Integer> products;
-    private final OrderStatusResponse orderStatus;
+public class OrderResponse {
 
-    OrderResponse(Order order){
+    private String orderId;
+    private Map<String, Integer> products;
+    private OrderStatusResponse orderStatus;
+
+    OrderResponse(Order order) {
         this.orderId = order.getOrderId();
         this.products = order.getProducts();
         this.orderStatus = toResponse(order.getOrderStatus());
+    }
+
+    /**
+     * Added for the integration test, since it's using Jackson for the response
+     */
+    OrderResponse() {
     }
 
     public String getOrderId() {

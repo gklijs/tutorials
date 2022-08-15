@@ -4,7 +4,7 @@ import com.mongodb.client.MongoClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 
-@DataMongoTest(properties = { "spring.mongodb.embedded.version=5.0.6" })
+@DataMongoTest
 public class MongoOrdersEventHandlerUnitTest extends AbstractOrdersEventHandlerUnitTest {
 
     @Autowired
