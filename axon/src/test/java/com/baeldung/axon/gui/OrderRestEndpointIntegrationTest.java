@@ -1,6 +1,8 @@
 package com.baeldung.axon.gui;
 
 import com.baeldung.axon.OrderApplication;
+import com.baeldung.axon.querymodel.OrderResponse;
+import com.baeldung.axon.querymodel.OrderStatusResponse;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;

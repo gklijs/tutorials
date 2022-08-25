@@ -1,10 +1,11 @@
-package com.baeldung.axon.gui;
+package com.baeldung.axon.querymodel;
 
 import com.baeldung.axon.coreapi.queries.Order;
+import com.baeldung.axon.querymodel.OrderStatusResponse;
 
 import java.util.Map;
 
-import static com.baeldung.axon.gui.OrderStatusResponse.toResponse;
+import static com.baeldung.axon.querymodel.OrderStatusResponse.toResponse;
 
 public class OrderResponse {
 

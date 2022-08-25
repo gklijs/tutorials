@@ -1,4 +1,4 @@
-package com.baeldung.axon.gui;
+package com.baeldung.axon.querymodel;
 
 import com.baeldung.axon.coreapi.queries.OrderStatus;
 

@@ -6,15 +6,9 @@ import com.baeldung.axon.coreapi.commands.CreateOrderCommand;
 import com.baeldung.axon.coreapi.commands.DecrementProductCountCommand;
 import com.baeldung.axon.coreapi.commands.IncrementProductCountCommand;
 import com.baeldung.axon.coreapi.commands.ShipOrderCommand;
-import com.baeldung.axon.coreapi.queries.FindAllOrderedProductsQuery;
-import com.baeldung.axon.coreapi.queries.Order;
-import com.baeldung.axon.coreapi.queries.OrderUpdatesQuery;
-import com.baeldung.axon.coreapi.queries.TotalProductsShippedQuery;
+import com.baeldung.axon.querymodel.OrderQueryService;
+import com.baeldung.axon.querymodel.OrderResponse;
 import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.axonframework.messaging.responsetypes.ResponseType;
-import org.axonframework.messaging.responsetypes.ResponseTypes;
-import org.axonframework.queryhandling.QueryGateway;
-import org.axonframework.queryhandling.SubscriptionQueryResult;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,18 +19,16 @@ import reactor.core.publisher.Flux;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @RestController
 public class OrderRestEndpoint {
 
     private final CommandGateway commandGateway;
-    private final QueryGateway queryGateway;
+    private final OrderQueryService orderQueryService;
 
-    public OrderRestEndpoint(CommandGateway commandGateway, QueryGateway queryGateway) {
+    public OrderRestEndpoint(CommandGateway commandGateway, OrderQueryService orderQueryService) {
         this.commandGateway = commandGateway;
-        this.queryGateway = queryGateway;
+        this.orderQueryService = orderQueryService;
     }
 
     @PostMapping("/ship-order")
@@ -97,24 +89,16 @@ public class OrderRestEndpoint {
 
     @GetMapping("/all-orders")
     public CompletableFuture<List<OrderResponse>> findAllOrders() {
-        return queryGateway.query(new FindAllOrderedProductsQuery(), ResponseTypes.multipleInstancesOf(Order.class))
-                .thenApply(r -> r.stream().map(OrderResponse::new).collect(Collectors.toList()));
+        return orderQueryService.findAllOrders();
     }
 
     @GetMapping("/total-shipped/{product-id}")
     public Integer totalShipped(@PathVariable("product-id") String productId) {
-        return queryGateway.scatterGather(new TotalProductsShippedQuery(productId), ResponseTypes.instanceOf(Integer.class), 10L, TimeUnit.SECONDS)
-                .reduce(0, Integer::sum);
+        return orderQueryService.totalShipped(productId);
     }
 
     @GetMapping(path = "/order-updates/{order-id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<OrderResponse> orderUpdates(@PathVariable("order-id") String orderId) {
-        return subscriptionQuery(new OrderUpdatesQuery(orderId), ResponseTypes.instanceOf(Order.class))
-                .map(OrderResponse::new);
-    }
-
-    private  <Q, R> Flux<R> subscriptionQuery(Q query, ResponseType<R> resultType) {
-        SubscriptionQueryResult<R,R> result = queryGateway.subscriptionQuery(query, resultType, resultType);
-        return result.initialResult().concatWith(result.updates()).doFinally(signal -> result.close());
+        return orderQueryService.orderUpdates(orderId);
     }
 }
