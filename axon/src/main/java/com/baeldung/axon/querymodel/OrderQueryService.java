@@ -8,6 +8,7 @@ import org.axonframework.messaging.responsetypes.ResponseType;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.axonframework.queryhandling.SubscriptionQueryResult;
+import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -46,5 +47,10 @@ public class OrderQueryService {
     private <Q, R> Flux<R> subscriptionQuery(Q query, ResponseType<R> resultType) {
         SubscriptionQueryResult<R, R> result = queryGateway.subscriptionQuery(query, resultType, resultType);
         return result.initialResult().concatWith(result.updates()).doFinally(signal -> result.close());
+    }
+
+    public Flux<OrderResponse> allOrdersStreaming() {
+        Publisher<Order> publisher = queryGateway.streamingQuery(new FindAllOrderedProductsQuery(), Order.class);
+        return Flux.from(publisher).map(OrderResponse::new);
     }
 }

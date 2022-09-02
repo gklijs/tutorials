@@ -16,9 +16,11 @@ import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
+import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,8 +98,8 @@ public class InMemoryOrdersEventHandler implements OrdersEventHandler {
     }
 
     @QueryHandler
-    public List<Order> handle(FindAllOrderedProductsQuery query) {
-        return new ArrayList<>(orders.values());
+    public Publisher<Order> handle(FindAllOrderedProductsQuery query) {
+        return Mono.fromCallable(orders::values).flatMapMany(Flux::fromIterable);
     }
 
     @QueryHandler

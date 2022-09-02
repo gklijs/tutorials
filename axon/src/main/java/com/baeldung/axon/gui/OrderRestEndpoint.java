@@ -101,4 +101,9 @@ public class OrderRestEndpoint {
     public Flux<OrderResponse> orderUpdates(@PathVariable("order-id") String orderId) {
         return orderQueryService.orderUpdates(orderId);
     }
+
+    @GetMapping(path = "/all-orders-streaming", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<OrderResponse> allOrdersStreaming() {
+        return orderQueryService.allOrdersStreaming();
+    }
 }

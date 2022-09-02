@@ -14,6 +14,8 @@ import com.baeldung.axon.coreapi.queries.OrderUpdatesQuery;
 import com.baeldung.axon.coreapi.queries.TotalProductsShippedQuery;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.junit.jupiter.api.*;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,16 +58,11 @@ public abstract class AbstractOrdersEventHandlerUnitTest {
     void givenTwoOrdersPlacedOfWhichOneNotShipped_whenFindAllOrderedProductsQuery_thenCorrectOrdersAreReturned() {
         resetWithTwoOrders();
 
-        List<Order> result = handler.handle(new FindAllOrderedProductsQuery());
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-
-        Order order_1 = result.stream().filter(o -> o.getOrderId().equals(ORDER_ID_1)).findFirst().orElse(null);
-        assertEquals(orderOne, order_1);
-
-        Order order_2 = result.stream().filter(o -> o.getOrderId().equals(ORDER_ID_2)).findFirst().orElse(null);
-        assertEquals(orderTwo, order_2);
+        StepVerifier.create(Flux.from(handler.handle(new FindAllOrderedProductsQuery())))
+                    .assertNext(order -> assertEquals(orderOne, order))
+                    .assertNext(order -> assertEquals(orderTwo, order))
+                    .expectComplete()
+                    .verify();
     }
 
     @Test
